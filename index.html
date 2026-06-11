@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yamen Al-Kabbani — Robotics &amp; Control Engineer</title>
+<meta name="description" content="Robotics & Control Engineer specializing in autonomous systems, ROS2, and mechatronic design. Builder of a fully autonomous 6-DOF vision-guided robotic arm." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05080f;
+    --bg2:#080d1a;
+    --panel:#0c1222;
+    --panel2:#101a30;
+    --line:rgba(120,170,220,.14);
+    --cyan:#22d3ee;
+    --cyan2:#38bdf8;
+    --blue:#0ea5e9;
+    --text:#e9f1fb;
+    --muted:#90a6c4;
+    --muted2:#6c809e;
+    --glow:0 0 22px rgba(34,211,238,.45);
+    --maxw:1160px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,Segoe UI,Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1100px 700px at 78% -5%, rgba(14,165,233,.16), transparent 60%),
+      radial-gradient(900px 600px at 8% 12%, rgba(34,211,238,.10), transparent 55%),
+      radial-gradient(800px 800px at 50% 110%, rgba(56,189,248,.10), transparent 60%),
+      var(--bg);
+  }
+  body::after{ /* subtle grid */
+    content:"";position:fixed;inset:0;z-index:-2;opacity:.5;
+    background-image:linear-gradient(rgba(120,170,220,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,170,220,.05) 1px,transparent 1px);
+    background-size:54px 54px;
+    -webkit-mask-image:radial-gradient(circle at 50% 30%, #000 0%, transparent 80%);
+            mask-image:radial-gradient(circle at 50% 30%, #000 0%, transparent 80%);
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+  .mono{font-family:'Orbitron',sans-serif;letter-spacing:.04em}
+  .accent{color:var(--cyan)}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    transition:.35s ease;
+    border-bottom:1px solid transparent;
+  }
+  nav.scrolled{
+    background:rgba(6,10,18,.78);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .logo{display:flex;align-items:center;gap:12px;font-family:'Orbitron';font-weight:700}
+  .logo .badge{
+    width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04121b;
+    font-size:14px;font-weight:900;box-shadow:var(--glow);
+  }
+  .logo .lname{font-size:15px;letter-spacing:.12em}
+  .logo .lname b{color:var(--cyan)}
+  .nav-links{display:flex;gap:6px;align-items:center}
+  .nav-links a{
+    font-size:13.5px;color:var(--muted);padding:9px 14px;border-radius:9px;
+    font-weight:500;transition:.2s;position:relative;letter-spacing:.02em;
+  }
+  .nav-links a:hover{color:var(--text)}
+  .nav-links a.active{color:var(--cyan)}
+  .nav-links a.active::after{
+    content:"";position:absolute;left:14px;right:14px;bottom:2px;height:2px;
+    background:var(--cyan);border-radius:2px;box-shadow:var(--glow);
+  }
+  .nav-cta{
+    margin-left:8px;border:1px solid var(--cyan);color:var(--cyan)!important;
+    border-radius:9px;padding:9px 16px!important;font-weight:600;
+  }
+  .nav-cta:hover{background:rgba(34,211,238,.12);box-shadow:var(--glow)}
+  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:0}
+  .burger span{width:24px;height:2px;background:var(--text);transition:.3s;border-radius:2px}
+  .burger.x span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .burger.x span:nth-child(2){opacity:0}
+  .burger.x span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+  /* ---------- HERO ---------- */
+  header.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
+  #arm-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;display:block}
+  .hero-scrim{
+    position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:linear-gradient(90deg, rgba(5,8,15,.92) 0%, rgba(5,8,15,.72) 38%, rgba(5,8,15,.18) 66%, rgba(5,8,15,0) 100%);
+  }
+  .hero-content{position:relative;z-index:3;width:100%;padding-top:70px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;font-family:'Orbitron';font-size:12px;
+    letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;margin-bottom:22px;
+    border:1px solid var(--line);padding:7px 14px;border-radius:30px;background:rgba(12,18,34,.5);
+  }
+  .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:var(--glow);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+  .hero h1{
+    font-family:'Orbitron';font-weight:900;line-height:1.02;
+    font-size:clamp(40px,7vw,82px);letter-spacing:.01em;margin-bottom:10px;
+  }
+  .hero h1 .l2{
+    background:linear-gradient(120deg,var(--cyan),var(--cyan2) 55%,#bdf4ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(34,211,238,.25);
+  }
+  .typed-wrap{font-family:'Orbitron';font-size:clamp(15px,2.4vw,23px);color:var(--text);
+    height:1.5em;margin:6px 0 22px;letter-spacing:.05em}
+  .typed{color:var(--cyan)}
+  .caret{display:inline-block;width:11px;background:var(--cyan);margin-left:3px;
+    animation:blink 1s steps(1) infinite;box-shadow:var(--glow)}
+  @keyframes blink{50%{opacity:0}}
+  .hero p.lead{max-width:560px;color:var(--muted);font-size:clamp(15px,1.7vw,17.5px);margin-bottom:32px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:14.5px;
+    padding:14px 24px;border-radius:12px;cursor:pointer;transition:.25s;border:1px solid transparent;
+  }
+  .btn-primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#04121b;box-shadow:var(--glow)}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 34px rgba(34,211,238,.6)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(12,18,34,.4)}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-3px)}
+  .btn svg{width:18px;height:18px}
+  .hint{
+    position:absolute;right:30px;bottom:30px;z-index:3;font-size:12px;color:var(--muted2);
+    display:flex;align-items:center;gap:8px;letter-spacing:.04em;
+    border:1px solid var(--line);padding:8px 13px;border-radius:30px;background:rgba(12,18,34,.45)
+  }
+  .hint svg{width:15px;height:15px;color:var(--cyan)}
+  .scroll-cue{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:3;
+    width:26px;height:42px;border:2px solid var(--line);border-radius:14px;display:grid;place-items:start center}
+  .scroll-cue i{width:4px;height:8px;background:var(--cyan);border-radius:3px;margin-top:7px;animation:drop 1.6s infinite}
+  @keyframes drop{0%{opacity:0;transform:translateY(0)}30%{opacity:1}70%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
+  /* HUD corners */
+  .hud{position:absolute;width:34px;height:34px;border-color:rgba(34,211,238,.5);z-index:3;pointer-events:none}
+  .hud.tl{top:84px;left:22px;border-top:2px solid;border-left:2px solid}
+  .hud.tr{top:84px;right:22px;border-top:2px solid;border-right:2px solid}
+  .hud.bl{bottom:22px;left:22px;border-bottom:2px solid;border-left:2px solid}
+  .hud.br{bottom:22px;right:22px;border-bottom:2px solid;border-right:2px solid}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:96px 0;position:relative}
+  .sec-head{margin-bottom:48px}
+  .sec-tag{font-family:'Orbitron';font-size:12px;letter-spacing:.28em;color:var(--cyan);text-transform:uppercase}
+  .sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(26px,4vw,40px);margin-top:10px;line-height:1.1}
+  .sec-sub{color:var(--muted);max-width:640px;margin-top:14px;font-size:15.5px}
+  .divider{height:1px;background:linear-gradient(90deg,var(--cyan),transparent);width:90px;margin-top:18px}
+
+  /* reveal */
+  .js .reveal{opacity:0;transform:translateY(34px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .js .reveal.in{opacity:1;transform:none}
+  .js .reveal.d1{transition-delay:.08s}.js .reveal.d2{transition-delay:.16s}
+  .js .reveal.d3{transition-delay:.24s}.js .reveal.d4{transition-delay:.32s}
+
+  /* ABOUT + STATS */
+  .about-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:48px;align-items:center}
+  .about-grid p{color:var(--muted);font-size:16px;margin-bottom:16px}
+  .about-grid p strong{color:var(--text)}
+  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .stat{
+    background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:16px;padding:22px 18px;text-align:center;position:relative;overflow:hidden;transition:.3s;
+  }
+  .stat:hover{border-color:rgba(34,211,238,.5);box-shadow:var(--glow);transform:translateY(-4px)}
+  .stat .num{font-family:'Orbitron';font-weight:900;font-size:34px;color:var(--cyan);line-height:1}
+  .stat .lbl{font-size:12.5px;color:var(--muted);margin-top:9px;letter-spacing:.02em}
+  .stat::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.6}
+
+  /* SKILLS */
+  .skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .skill-card{
+    background:linear-gradient(160deg,var(--panel),rgba(16,26,48,.6));border:1px solid var(--line);
+    border-radius:16px;padding:24px;transition:.3s;position:relative;overflow:hidden;
+  }
+  .skill-card:hover{transform:translateY(-5px);border-color:rgba(34,211,238,.45);box-shadow:0 16px 40px rgba(0,0,0,.4),var(--glow)}
+  .skill-card .ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;margin-bottom:16px;
+    background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3)}
+  .skill-card .ic svg{width:22px;height:22px;color:var(--cyan)}
+  .skill-card h3{font-size:16px;font-family:'Orbitron';font-weight:500;margin-bottom:14px;letter-spacing:.02em}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:12.5px;color:var(--muted);background:rgba(120,170,220,.08);border:1px solid var(--line);
+    padding:5px 11px;border-radius:20px;transition:.2s}
+  .skill-card:hover .chip{color:var(--text)}
+
+  /* PROJECTS */
+  .proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .proj{
+    background:linear-gradient(165deg,var(--panel),rgba(13,20,38,.5));border:1px solid var(--line);
+    border-radius:18px;padding:28px;position:relative;overflow:hidden;transition:.35s;
+  }
+  .proj.feat{grid-column:1 / -1;display:grid;grid-template-columns:1.5fr 1fr;gap:30px;align-items:center}
+  .proj:hover{transform:translateY(-6px);border-color:rgba(34,211,238,.5);box-shadow:0 22px 50px rgba(0,0,0,.45)}
+  .proj::before{content:"";position:absolute;inset:0;background:radial-gradient(500px 200px at 100% 0,rgba(34,211,238,.10),transparent 60%);opacity:0;transition:.35s}
+  .proj:hover::before{opacity:1}
+  .proj .badge2{
+    display:inline-flex;align-items:center;gap:7px;font-family:'Orbitron';font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:#04121b;background:linear-gradient(135deg,var(--cyan),var(--blue));
+    padding:5px 12px;border-radius:30px;font-weight:700;margin-bottom:16px;box-shadow:var(--glow)
+  }
+  .proj h3{font-family:'Orbitron';font-weight:600;font-size:20px;margin-bottom:12px;line-height:1.2}
+  .proj p{color:var(--muted);font-size:15px;margin-bottom:18px}
+  .proj .tags{display:flex;flex-wrap:wrap;gap:8px}
+  .proj .tags span{font-size:12px;color:var(--cyan);background:rgba(34,211,238,.08);
+    border:1px solid rgba(34,211,238,.22);padding:4px 10px;border-radius:7px}
+  .proj-visual{
+    aspect-ratio:1/.8;border-radius:14px;border:1px solid var(--line);position:relative;overflow:hidden;
+    background:radial-gradient(circle at 50% 40%,rgba(34,211,238,.18),rgba(8,13,26,.9) 70%);
+    display:grid;place-items:center;min-height:180px;
+  }
+  .proj-visual .big{font-family:'Orbitron';font-weight:900;font-size:46px;color:var(--cyan);text-shadow:var(--glow)}
+  .proj-visual .cap{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:11.5px;color:var(--muted);letter-spacing:.1em;font-family:'Orbitron'}
+  .ring{position:absolute;border:1px solid rgba(34,211,238,.25);border-radius:50%}
+  .ring.r1{inset:18%}.ring.r2{inset:30%}.ring.r3{inset:42%}
+
+  /* TIMELINE */
+  .timeline{position:relative;margin-left:8px;padding-left:34px}
+  .timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(var(--cyan),rgba(34,211,238,.15))}
+  .tl-item{position:relative;margin-bottom:34px}
+  .tl-item:last-child{margin-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-34px;top:4px;width:16px;height:16px;border-radius:50%;
+    background:var(--bg);border:3px solid var(--cyan);box-shadow:var(--glow)}
+  .tl-date{font-family:'Orbitron';font-size:12px;color:var(--cyan);letter-spacing:.08em}
+  .tl-item h3{font-size:17px;margin:6px 0 3px;font-weight:600}
+  .tl-item .org{color:var(--muted);font-size:14px;margin-bottom:8px}
+  .tl-item p{color:var(--muted);font-size:14.5px}
+  .tl-item p b{color:var(--text)}
+
+  /* ACHIEVEMENTS */
+  .ach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .ach{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:15px;padding:24px 20px;transition:.3s;text-align:center}
+  .ach:hover{transform:translateY(-5px);border-color:rgba(34,211,238,.45);box-shadow:var(--glow)}
+  .ach .ic{width:50px;height:50px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3)}
+  .ach .ic svg{width:26px;height:26px;color:var(--cyan)}
+  .ach h3{font-family:'Orbitron';font-size:15px;font-weight:600;margin-bottom:5px}
+  .ach p{color:var(--muted);font-size:13px}
+
+  /* TWO-COL (certs + education) */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .panel{background:linear-gradient(160deg,var(--panel),rgba(13,20,38,.5));border:1px solid var(--line);
+    border-radius:18px;padding:30px}
+  .panel h3{font-family:'Orbitron';font-size:17px;margin-bottom:20px;display:flex;align-items:center;gap:11px}
+  .panel h3 svg{width:21px;height:21px;color:var(--cyan)}
+  .row-item{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .row-item:last-child{border-bottom:0;padding-bottom:0}
+  .row-item .mk{color:var(--cyan);margin-top:5px;flex-shrink:0}
+  .row-item .mk svg{width:16px;height:16px}
+  .row-item b{font-weight:600}
+  .row-item span{color:var(--muted);font-size:14px;display:block}
+
+  /* CONTACT */
+  .contact{text-align:center}
+  .contact .big-cta{font-family:'Orbitron';font-weight:900;font-size:clamp(28px,5vw,52px);line-height:1.05;margin-bottom:18px}
+  .contact .big-cta .accent{display:inline-block}
+  .contact .lead{color:var(--muted);max-width:520px;margin:0 auto 34px;font-size:16px}
+  .contact-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:760px;margin:0 auto 34px}
+  .cc{background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:15px;padding:24px 16px;transition:.3s}
+  .cc:hover{border-color:rgba(34,211,238,.5);box-shadow:var(--glow);transform:translateY(-4px)}
+  .cc .ic{width:44px;height:44px;margin:0 auto 12px;border-radius:12px;display:grid;place-items:center;
+    background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3)}
+  .cc .ic svg{width:22px;height:22px;color:var(--cyan)}
+  .cc .k{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);font-family:'Orbitron'}
+  .cc .v{font-size:14px;margin-top:5px;word-break:break-word}
+  .socials{display:flex;gap:13px;justify-content:center;flex-wrap:wrap}
+  .social{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);padding:11px 18px;border-radius:11px;
+    color:var(--muted);transition:.25s;font-size:14px;background:rgba(12,18,34,.4)}
+  .social:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-3px);box-shadow:var(--glow)}
+  .social svg{width:17px;height:17px}
+
+  footer{padding:34px 0;border-top:1px solid var(--line);text-align:center;color:var(--muted2);font-size:13px}
+  footer .mono{color:var(--muted);font-size:12px;letter-spacing:.1em}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .skills-grid{grid-template-columns:repeat(2,1fr)}
+    .about-grid{grid-template-columns:1fr;gap:34px}
+    .ach-grid{grid-template-columns:repeat(2,1fr)}
+    .proj.feat{grid-template-columns:1fr}
+    .proj.feat .proj-visual{order:-1}
+  }
+  @media (max-width:680px){
+    .nav-links{
+      position:fixed;top:70px;right:0;left:0;flex-direction:column;gap:4px;
+      background:rgba(6,10,18,.97);backdrop-filter:blur(14px);padding:16px 22px 26px;
+      border-bottom:1px solid var(--line);transform:translateY(-160%);transition:.35s;align-items:stretch
+    }
+    .nav-links.open{transform:none}
+    .nav-links a{padding:13px 10px;font-size:15px}
+    .nav-cta{margin:6px 0 0;text-align:center}
+    .burger{display:flex}
+    .proj-grid,.two-col,.stats,.skills-grid,.contact-cards{grid-template-columns:1fr}
+    .ach-grid{grid-template-columns:1fr 1fr}
+    .hero-scrim{background:linear-gradient(180deg,rgba(5,8,15,.6),rgba(5,8,15,.86))}
+    .hint{display:none}
+    section{padding:72px 0}
+    .hud{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav id="nav">
+  <div class="wrap nav-inner">
+    <a href="#home" class="logo">
+      <span class="badge">YA</span>
+      <span class="lname">YAMEN <b>AL-KABBANI</b></span>
+    </a>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navlinks">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#achievements">Awards</a>
+      <a href="#contact" class="nav-cta">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero" id="home">
+  <canvas id="arm-canvas"></canvas>
+  <div class="hero-scrim"></div>
+  <span class="hud tl"></span><span class="hud tr"></span><span class="hud bl"></span><span class="hud br"></span>
+  <div class="wrap hero-content">
+    <span class="eyebrow"><span class="dot"></span> Robotics &amp; Control Engineer · Available Now</span>
+    <h1><span class="l1">YAMEN</span><br><span class="l2">AL-KABBANI</span></h1>
+    <div class="typed-wrap mono">&gt; <span class="typed" id="typed"></span><span class="caret">&nbsp;</span></div>
+    <p class="lead">I design and build autonomous robots — from a fully autonomous 6-DOF vision-guided arm running ROS2 on the edge, to a field-tested robot cleaning utility-scale solar farms.</p>
+    <div class="cta-row">
+      <a href="#projects" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        Explore My Work
+      </a>
+      <!-- Download CV: keep Yamen_Al-Kabbani_CV.pdf in the same folder as this page -->
+      <a href="Yamen_Al-Kabbani_CV.pdf" download class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+        Download CV
+      </a>
+    </div>
+  </div>
+  <div class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6m0 8v6M2 12h6m8 0h6"/><circle cx="12" cy="12" r="3"/></svg> Drag to rotate the arm</div>
+  <div class="scroll-cue"><i></i></div>
+</header>
+
+<!-- ================= ABOUT + STATS ================= -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">01 / Profile</div>
+      <h2 class="sec-title">Engineering autonomy,<br>from sensor to servo.</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="about-grid">
+      <div class="reveal">
+        <p>I'm a <strong>Robotics &amp; Control Engineer</strong> (B.Sc., 2026) specializing in autonomous robotic systems, ROS2, and mechatronic design. My graduation project — a <strong>fully autonomous 6-DOF vision-guided robotic arm</strong> integrating a depth camera, ROS2 containerized in Docker on a Raspberry Pi, and serial-bus servo control — earned a <strong>perfect 100% grade</strong>.</p>
+        <p>Beyond the lab, I'm a national robotics champion and a hands-on trainer who has taught <strong>30+ students</strong> and coached multiple competition teams to national finals. I'm currently developing a <strong>field-tested solar-panel cleaning robot</strong> for utility-scale solar farms — and I'm available immediately for R&amp;D robotics roles.</p>
+      </div>
+      <div class="stats reveal d1">
+        <div class="stat"><div class="num" data-target="100" data-suffix="%">0</div><div class="lbl">Graduation Project Grade</div></div>
+        <div class="stat"><div class="num" data-target="6" data-suffix="">0</div><div class="lbl">DOF Autonomous Arm</div></div>
+        <div class="stat"><div class="num" data-target="3000" data-suffix="+">0</div><div class="lbl">Solar Panels / Farm Scale</div></div>
+        <div class="stat"><div class="num" data-target="30" data-suffix="+">0</div><div class="lbl">Students Trained</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SKILLS ================= -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">02 / Toolkit</div>
+      <h2 class="sec-title">Technical Skills</h2>
+      <p class="sec-sub">A full-stack robotics skillset — mechanical design through perception, control, and edge deployment.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></div>
+        <h3>Robotics &amp; Autonomy</h3>
+        <div class="chips"><span class="chip">ROS2</span><span class="chip">Autonomous Manipulation</span><span class="chip">Robotic-Arm Design</span><span class="chip">Systems Integration</span><span class="chip">Sensor / Actuator Integration</span></div>
+      </div>
+      <div class="skill-card reveal d1">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg></div>
+        <h3>Programming</h3>
+        <div class="chips"><span class="chip">Python</span><span class="chip">C++</span><span class="chip">Arduino</span><span class="chip">AI-Assisted Development</span></div>
+      </div>
+      <div class="skill-card reveal d2">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/></svg></div>
+        <h3>Perception &amp; AI</h3>
+        <div class="chips"><span class="chip">Computer Vision (OpenCV)</span><span class="chip">Depth-Camera 3D Perception</span><span class="chip">Object Detection</span></div>
+      </div>
+      <div class="skill-card reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="6" width="12" height="12" rx="1"/><path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/></svg></div>
+        <h3>Embedded &amp; Hardware</h3>
+        <div class="chips"><span class="chip">Raspberry Pi</span><span class="chip">Microcontrollers</span><span class="chip">Serial-Bus Servos</span><span class="chip">Motor &amp; Motion Control</span></div>
+      </div>
+      <div class="skill-card reveal d1">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 22V12M21 7l-9 5-9-5"/></svg></div>
+        <h3>Mechanical &amp; Prototyping</h3>
+        <div class="chips"><span class="chip">SolidWorks</span><span class="chip">3D Mechanical Design</span><span class="chip">3D Printing</span><span class="chip">Design-for-Manufacture</span></div>
+      </div>
+      <div class="skill-card reveal d2">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17l6-6-6-6M12 19h8"/></svg></div>
+        <h3>Tools &amp; DevOps</h3>
+        <div class="chips"><span class="chip">Docker</span><span class="chip">Linux</span><span class="chip">Git</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROJECTS ================= -->
+<section id="projects">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">03 / Build Log</div>
+      <h2 class="sec-title">Featured Projects</h2>
+      <p class="sec-sub">Real robots — designed, built, programmed, and tested.</p>
+      <div class="divider"></div>
+    </div>
+    <div class="proj-grid">
+
+      <article class="proj feat reveal">
+        <div>
+          <span class="badge2">★ 100% Graduation Grade</span>
+          <h3>Autonomous 6-DOF Vision-Guided Robotic Arm</h3>
+          <p>A fully autonomous 6-degree-of-freedom robotic arm with an end-to-end perception-to-actuation pipeline. A depth camera feeds 3D perception into a ROS2 stack — containerized with Docker on a Raspberry Pi — that drives serial-bus servos for precise, coordinated multi-joint motion. Full autonomy from sensing through planning to actuation.</p>
+          <div class="tags"><span>ROS2</span><span>Docker</span><span>Raspberry Pi</span><span>Depth Camera</span><span>Computer Vision</span><span>Serial-Bus Servos</span><span>C++ / Python</span></div>
+        </div>
+        <div class="proj-visual">
+          <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+          <span class="big">6&deg;</span>
+          <span class="cap">DEGREES OF FREEDOM</span>
+        </div>
+      </article>
+
+      <article class="proj reveal d1">
+        <span class="badge2">Field-Tested · Near-MVP</span>
+        <h3>Solar-Panel Cleaning Robot</h3>
+        <p>A remote-controlled robot that cleans photovoltaic panels across utility-scale solar farms (3,000+ panels). Validated in real operating conditions and advancing toward a market-ready MVP with a clear path to commercialization in the solar-O&amp;M sector.</p>
+        <div class="tags"><span>Mechatronics</span><span>Solar O&amp;M</span><span>Field-Tested</span><span>Remote Control</span><span>Prototyping</span></div>
+      </article>
+
+      <article class="proj reveal d2">
+        <span class="badge2">1st Place — Syria</span>
+        <h3>Competition Robots — Sumo &amp; Arms</h3>
+        <p>Designed and programmed multiple autonomous Sumo robots — first place in Syria at ARC 2026 — alongside additional robotic arms built for training and live demonstration.</p>
+        <div class="tags"><span>Autonomous Control</span><span>Embedded</span><span>Arduino</span><span>Competition</span></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= EXPERIENCE ================= -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">04 / Track Record</div>
+      <h2 class="sec-title">Experience</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item reveal">
+        <div class="tl-date">2025 — Present</div>
+        <h3>Founder / Lead Engineer — Solar-Panel Cleaning Robot</h3>
+        <div class="org">Entrepreneurial Project</div>
+        <p>Leading the design and build of a robot for cleaning utility-scale solar farms — <b>field-tested on 3,000+ panel installations</b> and advancing toward a commercial MVP.</p>
+      </div>
+      <div class="tl-item reveal d1">
+        <div class="tl-date">2024</div>
+        <h3>Robotics Trainer</h3>
+        <div class="org">National Center for Distinguished Students</div>
+        <p>Selected to train Syria's top-performing students in robotics design, programming, and competition strategy. <b>Coached 4+ competitive teams</b>, several advancing to national-level events.</p>
+      </div>
+      <div class="tl-item reveal d2">
+        <div class="tl-date">2023 — 2024</div>
+        <h3>Robotics Trainer</h3>
+        <div class="org">Sera Robot Center</div>
+        <p>Delivered hands-on robotics training to <b>30+ students</b> across multiple age groups, and prepared teams for national &amp; international competitions (WRO, ARC), mentoring them to top rankings.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ACHIEVEMENTS ================= -->
+<section id="achievements">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="sec-tag">05 / Recognition</div>
+      <h2 class="sec-title">Competitions &amp; Awards</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="ach-grid">
+      <div class="ach reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v3a6 6 0 01-12 0V4zM6 6H3v1a3 3 0 003 3M18 6h3v1a3 3 0 01-3 3M9 16h6M8 20h8M12 13v3"/></svg></div>
+        <h3>1st Place — Syria</h3>
+        <p>ARC 2026 Sumo Robot Competition</p>
+      </div>
+      <div class="ach reveal d1">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="6"/><path d="M9 14l-2 8 5-3 5 3-2-8"/></svg></div>
+        <h3>2nd Place — Syria</h3>
+        <p>RFG Robotics Competition</p>
+      </div>
+      <div class="ach reveal d2">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/></svg></div>
+        <h3>1st — Audience Award</h3>
+        <p>ARC Competition</p>
+      </div>
+      <div class="ach reveal d3">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 3a14 14 0 000 18M12 3a14 14 0 010 18"/></svg></div>
+        <h3>WRO Coach</h3>
+        <p>Teams to top national rankings</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CERTS + EDUCATION ================= -->
+<section id="credentials" style="padding-top:0">
+  <div class="wrap">
+    <div class="two-col">
+      <div class="panel reveal">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="5"/><path d="M8 13l-2 8 6-3 6 3-2-8"/></svg> Certifications</h3>
+        <div class="row-item"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></span><div><b>WRO — World Robot Olympiad</b><span>Trainer &amp; Judge Certifications</span></div></div>
+        <div class="row-item"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></span><div><b>ARC Competition</b><span>Trainer &amp; Judge Certifications</span></div></div>
+        <div class="row-item"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></span><div><b>Languages</b><span>Arabic (Native) · English (Fluent)</span></div></div>
+      </div>
+      <div class="panel reveal d1">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5"/></svg> Education</h3>
+        <div class="row-item"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></span><div><b>B.Sc. Informatics Engineering — Control &amp; Robotics</b><span>Syrian Private University · 2026</span></div></div>
+        <div class="row-item"><span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></span><div><b>Graduation Project — 100%</b><span>Autonomous 6-DOF vision-guided robotic arm (ROS2)</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact">
+  <div class="wrap contact">
+    <div class="sec-tag reveal" style="text-align:center">06 / Get In Touch</div>
+    <h2 class="big-cta reveal d1">Let's build something <span class="accent">autonomous.</span></h2>
+    <p class="lead reveal d1">Open to R&amp;D robotics roles across Syria &amp; the Middle East — and available to start immediately. Let's talk.</p>
+    <div class="contact-cards reveal d2">
+      <a class="cc" href="mailto:Kabaneyamen@gmail.com">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></div>
+        <div class="k">Email</div><div class="v">Kabaneyamen@gmail.com</div>
+      </a>
+      <a class="cc" href="tel:+963954294126">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3-8.6A2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 2 .7 2.9a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.2-1.2a2 2 0 012.1-.5c.9.3 1.9.6 2.9.7a2 2 0 011.7 2z"/></svg></div>
+        <div class="k">Phone</div><div class="v">+963 954 294 126</div>
+      </a>
+      <div class="cc">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <div class="k">Location</div><div class="v">Syria · Open to relocation (MENA)</div>
+      </div>
+    </div>
+    <div class="socials reveal d3">
+      <!-- Replace href="#" with your real profile URLs once created -->
+      <a class="social" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 102.5 6 2.5 2.5 0 004.98 3.5zM2.9 8.5h4.2V21H2.9zM9.5 8.5h4v1.7h.06a4.4 4.4 0 013.96-2.2c4.2 0 5 2.8 5 6.4V21h-4.2v-5.6c0-1.3 0-3-1.9-3s-2.2 1.4-2.2 2.9V21H9.5z"/></svg>
+        LinkedIn <span style="opacity:.5;font-size:11px">(add link)</span>
+      </a>
+      <a class="social" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.6 2 12.2c0 4.5 2.9 8.3 6.8 9.6.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.4-3.4-1.4-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.3-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 015 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .3.3.7.9.7 1.9v2.8c0 .3.2.6.7.5 3.9-1.3 6.8-5.1 6.8-9.6C22 6.6 17.5 2 12 2z"/></svg>
+        GitHub <span style="opacity:.5;font-size:11px">(add link)</span>
+      </a>
+      <a class="social" href="Yamen_Al-Kabbani_CV.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+        Download CV
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="mono">YAMEN AL-KABBANI · ROBOTICS &amp; CONTROL ENGINEER</div>
+    <div style="margin-top:8px">Designed &amp; engineered for autonomy. © <span id="yr"></span></div>
+  </div>
+</footer>
+
+<!-- ================= THREE.JS ================= -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+document.documentElement.classList.add('js');
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+/* ---------- NAV ---------- */
+const nav = document.getElementById('nav');
+const burger = document.getElementById('burger');
+const navlinks = document.getElementById('navlinks');
+addEventListener('scroll', ()=> nav.classList.toggle('scrolled', scrollY > 40));
+burger.addEventListener('click', ()=>{ burger.classList.toggle('x'); navlinks.classList.toggle('open'); });
+navlinks.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=>{ burger.classList.remove('x'); navlinks.classList.remove('open'); }));
+
+/* active link on scroll */
+const sections = [...document.querySelectorAll('section[id], header[id]')];
+const linkMap = {};
+navlinks.querySelectorAll('a').forEach(a=>{ const id=a.getAttribute('href').slice(1); linkMap[id]=a; });
+const navObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){
+    navlinks.querySelectorAll('a').forEach(x=>x.classList.remove('active'));
+    const l = linkMap[e.target.id]; if(l) l.classList.add('active');
+  }});
+}, {rootMargin:'-45% 0px -50% 0px'});
+sections.forEach(s=>navObs.observe(s));
+
+/* ---------- REVEAL ---------- */
+const revObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); revObs.unobserve(e.target);} });
+}, {threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+/* ---------- COUNTERS ---------- */
+function runCounter(el){
+  const target = +el.dataset.target, suffix = el.dataset.suffix||'';
+  const dur = 1500, t0 = performance.now();
+  function step(t){
+    const p = Math.min((t-t0)/dur, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(target*eased).toLocaleString() + (p===1?suffix:'');
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const cObs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ runCounter(e.target); cObs.unobserve(e.target);} });
+}, {threshold:.6});
+document.querySelectorAll('.num[data-target]').forEach(el=>cObs.observe(el));
+
+/* ---------- TYPED ---------- */
+(function(){
+  const phrases = ['Autonomous Systems','ROS2 · Docker · Edge AI','Vision-Guided Robotics','Mechatronic Design','6-DOF Manipulation'];
+  const el = document.getElementById('typed');
+  let pi=0, ci=0, deleting=false;
+  function tick(){
+    const word = phrases[pi];
+    el.textContent = word.slice(0, ci);
+    if(!deleting){
+      if(ci < word.length){ ci++; setTimeout(tick, 70); }
+      else { deleting=true; setTimeout(tick, 1400); }
+    } else {
+      if(ci > 0){ ci--; setTimeout(tick, 35); }
+      else { deleting=false; pi=(pi+1)%phrases.length; setTimeout(tick, 350); }
+    }
+  }
+  tick();
+})();
+
+/* ---------- 3D ROBOTIC ARM ---------- */
+(function(){
+  const canvas = document.getElementById('arm-canvas');
+  if(typeof THREE === 'undefined'){ document.querySelector('.hint').style.display='none'; return; }
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  } catch(err){ document.querySelector('.hint').style.display='none'; return; }
+
+  const hero = document.querySelector('.hero');
+  let W = hero.clientWidth, H = hero.clientHeight;
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(W,H);
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x05080f, 0.035);
+
+  const camera = new THREE.PerspectiveCamera(42, W/H, 0.1, 100);
+  camera.position.set(6.5, 4.2, 9);
+
+  // lights
+  scene.add(new THREE.AmbientLight(0x33507a, 0.7));
+  const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(5,9,6); scene.add(key);
+  const cyanL = new THREE.PointLight(0x22d3ee, 2.4, 30); cyanL.position.set(-5,5,4); scene.add(cyanL);
+  const blueL = new THREE.PointLight(0x0ea5e9, 1.6, 30); blueL.position.set(4,2,-5); scene.add(blueL);
+
+  // grid floor
+  const grid = new THREE.GridHelper(40, 60, 0x22d3ee, 0x123047);
+  grid.material.transparent = true; grid.material.opacity = 0.32; grid.position.y = 0;
+  scene.add(grid);
+
+  // particles
+  const pGeo = new THREE.BufferGeometry();
+  const pcount = 240, parr = new Float32Array(pcount*3);
+  for(let i=0;i<pcount*3;i++) parr[i] = (Math.random()-0.5)*34;
+  pGeo.setAttribute('position', new THREE.BufferAttribute(parr,3));
+  const pts = new THREE.Points(pGeo, new THREE.PointsMaterial({color:0x22d3ee, size:0.06, transparent:true, opacity:0.55}));
+  scene.add(pts);
+
+  // materials
+  const metal  = new THREE.MeshStandardMaterial({color:0x29384f, metalness:0.85, roughness:0.38});
+  const metal2 = new THREE.MeshStandardMaterial({color:0x1c2638, metalness:0.8, roughness:0.45});
+  const accent = new THREE.MeshStandardMaterial({color:0x06222e, emissive:0x22d3ee, emissiveIntensity:0.9, metalness:0.5, roughness:0.3});
+  const glowMat= new THREE.MeshBasicMaterial({color:0x53e7ff});
+
+  function stripe(parent, len, w){
+    const s = new THREE.Mesh(new THREE.BoxGeometry(w*1.04, len*0.10, w*1.04), accent);
+    s.position.y = len*0.62; parent.add(s);
+  }
+  function link(len, w){
+    const g = new THREE.Group();
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, len, w), metal);
+    m.position.y = len/2; g.add(m);
+    stripe(g, len, w);
+    return g;
+  }
+  function joint(parent, r){
+    r = r||0.26;
+    const s = new THREE.Mesh(new THREE.SphereGeometry(r,24,24), glowMat); parent.add(s);
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(r*1.5,20,20),
+      new THREE.MeshBasicMaterial({color:0x22d3ee, transparent:true, opacity:0.16})); parent.add(halo);
+  }
+
+  // pivot lets the user rotate the whole arm
+  const pivot = new THREE.Group(); scene.add(pivot);
+  const arm = new THREE.Group(); pivot.add(arm);
+
+  // base
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.95,1.15,0.34,48), metal2);
+  base.position.y = 0.17; arm.add(base);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.92,0.045,16,56), accent);
+  ring.rotation.x = Math.PI/2; ring.position.y = 0.35; arm.add(ring);
+
+  const j0 = new THREE.Group(); j0.position.y = 0.34; arm.add(j0);          // yaw
+  const housing = new THREE.Mesh(new THREE.CylinderGeometry(0.6,0.7,0.6,40), metal); housing.position.y=0.3; j0.add(housing);
+  joint(j0, 0.3);
+
+  const j1 = new THREE.Group(); j1.position.y = 0.6; j0.add(j1);            // shoulder pitch
+  joint(j1, 0.30); j1.add(link(2.1, 0.38));
+
+  const j2 = new THREE.Group(); j2.position.y = 2.1; j1.add(j2);            // elbow
+  joint(j2, 0.26); j2.add(link(1.7, 0.30));
+
+  const j3 = new THREE.Group(); j3.position.y = 1.7; j2.add(j3);            // wrist pitch
+  joint(j3, 0.21);
+  const wrist = new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.22,0.5,28), metal); wrist.position.y=0.28; j3.add(wrist);
+
+  const j4 = new THREE.Group(); j4.position.y = 0.55; j3.add(j4);           // gripper roll/base
+  const palm = new THREE.Mesh(new THREE.BoxGeometry(0.62,0.2,0.34), metal); palm.position.y=0.1; j4.add(palm);
+  const fingerGeo = new THREE.BoxGeometry(0.1,0.42,0.26);
+  const fL = new THREE.Mesh(fingerGeo, accent); fL.position.set(-0.2,0.36,0); j4.add(fL);
+  const fR = new THREE.Mesh(fingerGeo, accent); fR.position.set( 0.2,0.36,0); j4.add(fR);
+
+  // a glowing target the arm "reaches" toward
+  const target = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2,0),
+    new THREE.MeshStandardMaterial({color:0x06222e, emissive:0x53e7ff, emissiveIntensity:1.0}));
+  scene.add(target);
+
+  // shift the arm to the right on wide screens
+  function layout(){ arm.position.x = (W>820)? 1.6 : 0; camera.lookAt(arm.position.x, 2.0, 0); }
+  layout();
+
+  // ---- interaction ----
+  let dragging=false, px=0, py=0, tYaw=-0.5, tTilt=0.05, yaw=-0.5, tilt=0.05, auto=true;
+  function down(x,y){ dragging=true; auto=false; px=x; py=y; }
+  function move(x,y){ if(!dragging) return; tYaw += (x-px)*0.01; tTilt += (y-py)*0.006;
+    tTilt = Math.max(-0.5, Math.min(0.6, tTilt)); px=x; py=y; }
+  function up(){ dragging=false; }
+  canvas.addEventListener('pointerdown', e=>down(e.clientX,e.clientY));
+  addEventListener('pointermove', e=>move(e.clientX,e.clientY));
+  addEventListener('pointerup', up);
+  canvas.style.touchAction = 'pan-y';
+
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    if(auto) tYaw += 0.0016;
+    yaw  += (tYaw - yaw)*0.06;
+    tilt += (tTilt - tilt)*0.06;
+    pivot.rotation.y = yaw;
+    pivot.rotation.x = tilt;
+
+    // choreographed idle motion
+    j0.rotation.y = Math.sin(t*0.35)*0.55;
+    j1.rotation.z = -0.32 + Math.sin(t*0.55)*0.30;
+    j2.rotation.z = 0.85 + Math.sin(t*0.5+1.0)*0.38;
+    j3.rotation.z = Math.sin(t*0.7+0.5)*0.35;
+    j4.rotation.y = t*0.6;
+    const grip = 0.13 + Math.abs(Math.sin(t*0.5))*0.12;
+    fL.position.x = -grip; fR.position.x = grip;
+
+    // move the target around so the arm looks purposeful
+    target.position.set(arm.position.x + Math.cos(t*0.5)*2.2, 2.4 + Math.sin(t*0.55)*1.1, Math.sin(t*0.5)*2.2);
+    target.rotation.x = t; target.rotation.y = t*0.7;
+
+    pts.rotation.y = t*0.02;
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  addEventListener('resize', ()=>{
+    W = hero.clientWidth; H = hero.clientHeight;
+    renderer.setSize(W,H); camera.aspect = W/H; camera.updateProjectionMatrix(); layout();
+  });
+})();
+</script>
+</body>
+</html>
